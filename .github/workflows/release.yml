@@ -1,5 +1,4 @@
-name: Release Automática de API (TribeCraft)
-#Extension: R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_ENDPOINT, R2_BUCKET, DISCORD_WEBHOOK, DISCORD_RELEASES_WEBHOOK, SONATYPE_USERNAME, SONATYPE_PASSWORD, GPG_PRIVATE_KEY, GPG_PASSPHRASE
+name: Release Automática de API (Obsidrel)
 
 on:
   push:
@@ -13,8 +12,8 @@ env:
   # --- NOVAS CONFIGURAÇÕES DINÂMICAS PARA O MANIFESTO ---
   API_DESCRIPTION: "API de Integração Oficial"
   API_DEPENDENCIES: '["Obsidrel"]' # Mantenha a sintaxe de array JSON em string simples
-  DISCORD_EMBED_TRIBE: "https://api.tribecraft.com.br/src/logo.png"
-  DISCORD_EMBED_THUMBNAIL: "https://api.tribecraft.com.br/src/raids_thumbnail.png"
+  DISCORD_EMBED_OBSIDREL: ""
+  DISCORD_EMBED_THUMBNAIL: ""
   # Configuração base limpa para evitar quebras de variáveis globais
   UPDATE_TITLE: "🔌 Obsidrel API"
   UPDATE_MESSAGE: |
@@ -54,7 +53,7 @@ jobs:
           VERSION_TAG="${{ github.ref_name }}"
           curl -s -X POST -H "Content-Type: application/json" \
                -d '{
-                 "username": "TribeCraft Build",
+                 "username": "Obsidrel Build",
                  "avatar_url": "${{ env.DISCORD_EMBED_THUMBNAIL }}",
                  "embeds": [{
                    "description": "⏳ **Iniciando Build da API: ${{ env.MAVEN_NAME }}** `'"$VERSION_TAG"'`\nPreparando ambiente...",
@@ -94,7 +93,7 @@ jobs:
         run: |
           curl -s -X POST -H "Content-Type: application/json" \
                -d '{
-                 "username": "TribeCraft Build",
+                 "username": "Obsidrel Build",
                  "avatar_url": "${{ env.DISCORD_EMBED_THUMBNAIL }}",
                  "embeds": [{
                    "description": "📦 **API Compilada e Enviada ao Maven Central: ${{ env.MAVEN_NAME }}**\n`${{ env.JAR_NAME }}`\nEnviando agora para o R2 e Git...",
@@ -179,7 +178,7 @@ jobs:
           RAW_TITLE: ${{ env.UPDATE_TITLE }}
           MAVEN_NAME: ${{ env.MAVEN_NAME }}
           MAVEN_VERSION: ${{ env.MAVEN_VERSION }}
-          TRIBE: ${{ env.DISCORD_EMBED_TRIBE }}
+          OBSIDREL: ${{ env.DISCORD_EMBED_OBSIDREL }}
           THUMB: ${{ env.DISCORD_EMBED_THUMBNAIL }}
           GITHUB_REPO_URL: "${{ github.server_url }}/${{ github.repository }}"
         run: |
@@ -210,14 +209,14 @@ jobs:
           final_description = "\n".join(msg_linhas)
           
           payload = {
-              "username": "TribeCraft Build",
-              "avatar_url": os.getenv("TRIBE"),
+              "username": "Obsidrel Build",
+              "avatar_url": os.getenv("OBSIDREL"),
               "embeds": [{
                   "title": final_title,
                   "description": final_description,
                   "color": 10181046,
                   "thumbnail": {"url": os.getenv("THUMB")},
-                  "footer": {"text": f"API: {m_name} | TribeCraft Studios", "icon_url": os.getenv("TRIBE")}
+                  "footer": {"text": f"API: {m_name} | Obsidrel Studios", "icon_url": os.getenv("OBSIDREL")}
               }]
           }
           
@@ -230,7 +229,7 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
                -d '{
-                 "username": "TribeCraft Build",
+                 "username": "Obsidrel Build",
                  "embeds": [{
                    "title": "❌ Erro na API",
                    "description": "Falha ao compilar ou publicar `${{ env.MAVEN_NAME }}`.\n[Ver Erro](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
