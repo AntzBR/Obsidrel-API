@@ -1,30 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project
-        xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="
-        http://maven.apache.org/POM/4.0.0
-        https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- ====================================================== -->
-    <!-- Project                                                -->
-    <!-- ====================================================== -->
-
     <groupId>io.github.antzbr</groupId>
     <artifactId>ObsidrelAPI</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-REV-1.3-RELEASE</version>
     <packaging>jar</packaging>
 
     <name>ObsidrelAPI</name>
     <description>Public API for Obsidrel.</description>
-    <url>https://github.com/AntzBR/ObsidrelAPI</url>
-
-    <!-- ====================================================== -->
-    <!-- License                                                -->
-    <!-- ====================================================== -->
+    <url>https://github.com/AntzBR/Obsidrel-API</url>
 
     <licenses>
         <license>
@@ -34,10 +23,6 @@
         </license>
     </licenses>
 
-    <!-- ====================================================== -->
-    <!-- Developer                                              -->
-    <!-- ====================================================== -->
-
     <developers>
         <developer>
             <id>antzbr</id>
@@ -46,94 +31,61 @@
         </developer>
     </developers>
 
-    <!-- ====================================================== -->
-    <!-- Source Control                                         -->
-    <!-- ====================================================== -->
-
     <scm>
-        <connection>
-            scm:git:https://github.com/AntzBR/ObsidrelAPI.git
-        </connection>
-
-        <developerConnection>
-            scm:git:ssh://git@github.com/AntzBR/ObsidrelAPI.git
-        </developerConnection>
-
-        <url>
-            https://github.com/AntzBR/ObsidrelAPI/tree/main
-        </url>
-
+        <connection>scm:git:git://github.com/AntzBR/Obsidrel-API.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/AntzBR/Obsidrel-API.git</developerConnection>
+        <url>https://github.com/AntzBR/Obsidrel-API/tree/main</url>
         <tag>HEAD</tag>
     </scm>
-
-    <!-- ====================================================== -->
-    <!-- Properties                                             -->
-    <!-- ====================================================== -->
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
         <java.version>21</java.version>
-
         <maven.compiler.release>${java.version}</maven.compiler.release>
-
         <spigot.version>1.21.11-R0.1-SNAPSHOT</spigot.version>
     </properties>
 
-    <!-- ====================================================== -->
-    <!-- Repositories                                           -->
-    <!-- ====================================================== -->
-
-    <repositories>
-
-        <!-- Spigot API -->
-        <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-
-    </repositories>
-
-    <!-- ====================================================== -->
-    <!-- Dependencies                                           -->
-    <!-- ====================================================== -->
-
-    <dependencies>
-
-        <!--
-            Bukkit/Spigot types exposed by ObsidrelAPI.
-
-            PROVIDED:
-            ObsidrelAPI must never bundle the server API inside its JAR.
-        -->
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>${spigot.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-		<!--Spigot -->
-    </dependencies>
-
-    <!-- ====================================================== -->
-    <!-- Build                                                  -->
-    <!-- ====================================================== -->
-
     <build>
-
         <plugins>
 
-            <!-- ================================================== -->
-            <!-- Java Compiler                                      -->
-            <!-- ================================================== -->
+            <!--
+                Generates the POM used by install/deploy.
+                The project still compiles against Spigot locally, while the
+                published Maven Central POM does not contain SNAPSHOT dependencies.
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <flattenMode>ossrh</flattenMode>
+                    <pomElements>
+                        <dependencies>remove</dependencies>
+                    </pomElements>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
-
                 <configuration>
                     <release>${java.version}</release>
                     <encoding>${project.build.sourceEncoding}</encoding>
@@ -142,161 +94,111 @@
                 </configuration>
             </plugin>
 
-            <!-- ================================================== -->
-            <!-- Main JAR                                           -->
-            <!-- ================================================== -->
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.4.2</version>
-
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Automatic-Module-Name>
-                                me.antzbr.obsidrel.api
-                            </Automatic-Module-Name>
-
-                            <Implementation-Title>
-                                ObsidrelAPI
-                            </Implementation-Title>
-
-                            <Implementation-Version>
-                                ${project.version}
-                            </Implementation-Version>
+                            <Automatic-Module-Name>me.antzbr.obsidrel.api</Automatic-Module-Name>
+                            <Implementation-Title>ObsidrelAPI</Implementation-Title>
+                            <Implementation-Version>${project.version}</Implementation-Version>
                         </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
 
-        </plugins>
+            <!-- Central Publishing handles the publication bundle itself. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.1.4</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.11.2</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <docencoding>UTF-8</docencoding>
+                    <charset>UTF-8</charset>
+                    <doclint>none</doclint>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.2.7</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.11.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>false</autoPublish>
+                </configuration>
+            </plugin>
+
+        </plugins>
     </build>
 
-    <!-- ====================================================== -->
-    <!-- Profiles                                               -->
-    <!-- ====================================================== -->
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
 
-    <profiles>
-
-        <!--
-            Maven Central publication.
-
-            Not enabled by default.
-
-            Usage:
-                mvn clean deploy -Pcentral
-        -->
-        <profile>
-
-            <id>central</id>
-
-            <build>
-
-                <plugins>
-
-                    <!-- ============================================== -->
-                    <!-- Sources JAR                                    -->
-                    <!-- ============================================== -->
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>3.3.1</version>
-
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <phase>package</phase>
-
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <!-- ============================================== -->
-                    <!-- Javadoc JAR                                    -->
-                    <!-- ============================================== -->
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.11.2</version>
-
-                        <configuration>
-                            <encoding>UTF-8</encoding>
-                            <docencoding>UTF-8</docencoding>
-                            <charset>UTF-8</charset>
-
-                            <doclint>none</doclint>
-                        </configuration>
-
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <phase>package</phase>
-
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <!-- ============================================== -->
-                    <!-- GPG Signature                                  -->
-                    <!-- ============================================== -->
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.7</version>
-
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <!-- ============================================== -->
-                    <!-- Maven Central Publisher                        -->
-                    <!-- ============================================== -->
-
-                    <plugin>
-                        <groupId>org.sonatype.central</groupId>
-                        <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.11.0</version>
-
-                        <extensions>true</extensions>
-
-                        <configuration>
-                            <publishingServerId>central</publishingServerId>
-
-                            <!--
-                                false = upload + validate, then publish manually
-                                through central.sonatype.com.
-
-                                Change to true later if desired.
-                            -->
-                            <autoPublish>false</autoPublish>
-                        </configuration>
-                    </plugin>
-
-                </plugins>
-
-            </build>
-
-        </profile>
-
-    </profiles>
+    <dependencies>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>${spigot.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
 
 </project>
