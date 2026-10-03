@@ -75,7 +75,7 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
         run: |
-          mvn clean deploy \
+          mvn clean deploy -Pcentral \
             -B \
             --no-transfer-progress \
             -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
