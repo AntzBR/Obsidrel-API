@@ -112,8 +112,9 @@
             <artifactId>spigot-api</artifactId>
             <version>${spigot.version}</version>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
-
+		<!--Spigot -->
     </dependencies>
 
     <!-- ====================================================== -->
