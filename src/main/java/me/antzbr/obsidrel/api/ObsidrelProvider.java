@@ -12,7 +12,20 @@ public final class ObsidrelProvider {
     }
 
     public static ObsidrelPlatform get() {
-        return getOptional().orElseThrow(IllegalStateException::new);
+        return getOptional().orElseThrow(() -> new IllegalStateException("Obsidrel API is not available"));
+    }
+
+    public static ObsidrelPlatform require(int apiLevel) {
+        ObsidrelPlatform platform = get();
+        if (apiLevel <= 0 || apiLevel > platform.apiLevel()) {
+            throw new IllegalStateException("Obsidrel API level " + apiLevel
+                    + " is not supported by runtime API level " + platform.apiLevel());
+        }
+        return platform;
+    }
+
+    public static boolean supports(int apiLevel) {
+        return apiLevel > 0 && getOptional().map(platform -> apiLevel <= platform.apiLevel()).orElse(false);
     }
 
     public static Optional<ObsidrelPlatform> getOptional() {

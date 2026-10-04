@@ -19,6 +19,18 @@ public interface AddonContext {
 
     AddonDescriptor descriptor();
 
+    default String id() {
+        return descriptor().id();
+    }
+
+    default String version() {
+        return descriptor().version();
+    }
+
+    default boolean isAddonEnabled(String addonId) {
+        return api().addons().isEnabled(addonId);
+    }
+
     AddonServiceRegistry services();
 
     Path dataDirectory();

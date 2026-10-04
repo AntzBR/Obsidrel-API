@@ -1,6 +1,8 @@
 package me.antzbr.obsidrel.api.addon;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import me.antzbr.obsidrel.api.ObsidrelApiVersion;
 
@@ -24,12 +26,15 @@ public record AddonDescriptor(
         if (apiLevel <= 0) throw new IllegalArgumentException("Addon apiLevel must be positive");
         coreRange = coreRange == null || coreRange.isBlank() ? "*" : coreRange.trim();
         authors = immutableStrings(authors);
-        dependencies = dependencies == null ? List.of() : List.copyOf(dependencies);
-        softDependencies = softDependencies == null ? List.of() : List.copyOf(softDependencies);
-        conflicts = conflicts == null ? List.of() : List.copyOf(conflicts);
+        dependencies = dependencies(dependencies, "dependencies", id);
+        softDependencies = dependencies(softDependencies, "soft-dependencies", id);
+        conflicts = dependencies(conflicts, "conflicts", id);
+        ensureDisjoint(dependencies, softDependencies, "dependencies", "soft-dependencies");
+        ensureDisjoint(dependencies, conflicts, "dependencies", "conflicts");
+        ensureDisjoint(softDependencies, conflicts, "soft-dependencies", "conflicts");
     }
 
-    /** Binary/source bridge for RC47-RC51 addon code that used the previous descriptor shape. */
+    /** Binary/source bridge for addons compiled against the previous descriptor shape. */
     public AddonDescriptor(String id, String name, String version, String mainClass, int apiLevel,
             String coreRange, List<String> authors, List<AddonDependency> dependencies,
             List<AddonDependency> softDependencies) {
@@ -38,6 +43,31 @@ public record AddonDescriptor(
 
     public boolean apiCompatible() {
         return ObsidrelApiVersion.supports(apiLevel);
+    }
+
+    private static List<AddonDependency> dependencies(List<AddonDependency> values, String field, String selfId) {
+        if (values == null || values.isEmpty()) return List.of();
+        Map<String, AddonDependency> unique = new LinkedHashMap<>();
+        for (AddonDependency dependency : values) {
+            if (dependency == null) throw new IllegalArgumentException("Null addon dependency in " + field);
+            if (dependency.id().equals(selfId)) {
+                throw new IllegalArgumentException("Addon '" + selfId + "' cannot reference itself in " + field);
+            }
+            if (unique.putIfAbsent(dependency.id(), dependency) != null) {
+                throw new IllegalArgumentException("Duplicate addon dependency '" + dependency.id() + "' in " + field);
+            }
+        }
+        return List.copyOf(unique.values());
+    }
+
+    private static void ensureDisjoint(List<AddonDependency> left, List<AddonDependency> right,
+                                       String leftName, String rightName) {
+        for (AddonDependency dependency : left) {
+            if (right.stream().anyMatch(other -> other.id().equals(dependency.id()))) {
+                throw new IllegalArgumentException("Addon dependency '" + dependency.id()
+                        + "' cannot be declared in both " + leftName + " and " + rightName);
+            }
+        }
     }
 
     private static String requireText(String value, String label) {

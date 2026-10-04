@@ -12,4 +12,11 @@ public final class ObsidrelApiVersion {
     public static boolean supports(int requiredLevel) {
         return requiredLevel > 0 && requiredLevel <= LEVEL;
     }
+
+    public static void require(int requiredLevel) {
+        if (!supports(requiredLevel)) {
+            throw new IllegalStateException("Obsidrel API level " + requiredLevel
+                    + " is not supported by runtime API level " + LEVEL);
+        }
+    }
 }
