@@ -18,7 +18,7 @@ The Obsidrel Core provides the API implementation at runtime. **Do not shade or 
 
 - Java 21
 - Obsidrel API level `1`
-- ObsidrelAPI `1.0.0-REV-2.0-RELEASE`
+- ObsidrelAPI
 
 API level 1 is the public contract for the Obsidrel 1.0 line.
 
@@ -39,7 +39,7 @@ API level 1 is the public contract for the Obsidrel 1.0 line.
 
 ```gradle
 dependencies {
-    compileOnly("io.github.antzbr:ObsidrelAPI:1.0.0-REV-2.0-RELEASE")
+    compileOnly("io.github.antzbr:ObsidrelAPI:VERSION")
 }
 ```
 
