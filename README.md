@@ -1,4 +1,4 @@
-# ObsidrelAPI 1.0.0
+# ObsidrelAPI 1.0.0-REV-2.0-RELEASE
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.antzbr/ObsidrelAPI?color=blue&label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.antzbr/ObsidrelAPI)
 [![](https://jitpack.io/v/AntzBR/ObsidrelAPI.svg)](https://jitpack.io/#AntzBR/ObsidrelAPI)
@@ -18,7 +18,7 @@ The Obsidrel Core provides the API implementation at runtime. **Do not shade or 
 
 - Java 21
 - Obsidrel API level `1`
-- ObsidrelAPI `1.0.0`
+- ObsidrelAPI `1.0.0-REV-2.0-RELEASE`
 
 API level 1 is the public contract for the Obsidrel 1.0 line.
 
@@ -39,7 +39,7 @@ API level 1 is the public contract for the Obsidrel 1.0 line.
 
 ```gradle
 dependencies {
-    compileOnly("io.github.antzbr:ObsidrelAPI:1.0.0")
+    compileOnly("io.github.antzbr:ObsidrelAPI:1.0.0-REV-2.0-RELEASE")
 }
 ```
 
@@ -109,6 +109,22 @@ obsidrel.apiVersion();
 obsidrel.coreVersion();
 ```
 
+
+## Public event contract
+
+Obsidrel events are ordinary Bukkit/Paper events. Plugins use the normal Bukkit listener model, and native addons can register listeners through `AddonContext.registerListener(...)` so cleanup is automatic.
+
+The public contract distinguishes two semantics:
+
+- **PRE / cancellable** — fired before Obsidrel commits the operation. Cancelling the event prevents the Obsidrel-side effect.
+- **POST / notification** — fired after the relevant runtime state has been committed. These events are intentionally not cancellable.
+
+Core PRE events include `ObsidrelFurnitureInteractEvent`, `ObsidrelEntityInteractEvent` and `ObsidrelActionExecuteEvent`. Core POST notifications include `ObsidrelAnimationFinishEvent`, `ObsidrelEntitySpawnEvent`, `ObsidrelEntityDeathEvent` and `ObsidrelStateChangeEvent`. Existing block, item, furniture, armor, cosmetic, loot, trigger and player-data events remain available under `me.antzbr.obsidrel.api.event`.
+
+`ObsidrelStateChangeEvent` uses immutable string-map snapshots and identifies the target domain (`BLOCK`, `FURNITURE`, `ENTITY`) plus whether the transition belongs to content state or animation state. This keeps consumers independent from Core implementation classes and allows future integrations to consume new stateful systems without a private bridge.
+
+`ObsidrelAnimationFinishEvent` is a POST notification for authored `ONCE` animations and identifies the runtime target, definition, instance, state, clip, channel and trigger that completed.
+
 ## Native Obsidrel addon
 
 A native addon implements:
@@ -166,7 +182,7 @@ version: 1.0.0
 main: com.example.obsidrel.ExampleAddon
 
 api-level: 1
-core: ">=0.9.1-RC56"
+core: ">=0.9.1-RC60-HF1"
 
 authors:
   - Example
@@ -300,7 +316,7 @@ The public contract exposes both an API version and an API level.
 import me.antzbr.obsidrel.api.ObsidrelApiVersion;
 
 ObsidrelApiVersion.LEVEL;      // 1
-ObsidrelApiVersion.VERSION;    // 1.0.0
+ObsidrelApiVersion.VERSION;    // 1.0.0-REV-2.0-RELEASE
 
 ObsidrelApiVersion.supports(1);
 ObsidrelApiVersion.require(1);

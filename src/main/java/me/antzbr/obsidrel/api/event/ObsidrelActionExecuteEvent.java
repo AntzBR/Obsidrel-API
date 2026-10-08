@@ -8,7 +8,7 @@ import org.bukkit.event.HandlerList;
 import me.antzbr.obsidrel.api.view.ActionContextView;
 import me.antzbr.obsidrel.api.view.ActionView;
 
-/** Fired before a reusable Obsidrel action sequence is accepted for execution. */
+/** PRE / cancellable event fired before a reusable Obsidrel action sequence is accepted for execution. */
 public final class ObsidrelActionExecuteEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player player;

@@ -8,6 +8,7 @@ import org.bukkit.event.HandlerList;
 import me.antzbr.obsidrel.api.view.FurnitureInstanceView;
 import me.antzbr.obsidrel.api.view.FurnitureView;
 
+/** PRE / cancellable event fired before Obsidrel applies furniture interaction side effects. */
 public final class ObsidrelFurnitureInteractEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player player;
