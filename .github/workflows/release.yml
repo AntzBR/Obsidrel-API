@@ -32,21 +32,36 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Extrair Informações do Maven
-        run: |
-          echo "MAVEN_NAME=$(mvn help:evaluate -Dexpression=project.name -q -DforceStdout)" >> $GITHUB_ENV
-          echo "MAVEN_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
-
       - name: Configurar Java
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.MIN_JAVA_VERSION }}
           distribution: 'temurin'
           cache: 'maven'
-          # --- ADICIONE ESTAS LINHAS ABAIXO ---
           server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
+
+      # Maven fixado para evitar regressões do runner/empacotamento do Central.
+      - name: Configurar Maven 3.9.16
+        shell: bash
+        run: |
+          MAVEN_VERSION="3.9.16"
+          MAVEN_DIR="/opt/apache-maven-${MAVEN_VERSION}"
+
+          curl -fsSL             "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/${MAVEN_VERSION}/apache-maven-${MAVEN_VERSION}-bin.tar.gz"             -o /tmp/apache-maven.tar.gz
+
+          sudo tar -xzf /tmp/apache-maven.tar.gz -C /opt
+          echo "MAVEN_HOME=${MAVEN_DIR}" >> "$GITHUB_ENV"
+          echo "${MAVEN_DIR}/bin" >> "$GITHUB_PATH"
+
+      - name: Verificar Maven
+        run: mvn --version
+
+      - name: Extrair Informações do Maven
+        run: |
+          echo "MAVEN_NAME=$(mvn help:evaluate -Dexpression=project.name -q -DforceStdout)" >> $GITHUB_ENV
+          echo "MAVEN_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
       - name: Notificar Início (Discord)
         run: |
