@@ -1,4 +1,4 @@
-# ObsidrelAPI 1.0.0-REV-2.0-RELEASE
+# ObsidrelAPI 1.0.0
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.antzbr/ObsidrelAPI?color=blue&label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.antzbr/ObsidrelAPI)
 [![](https://jitpack.io/v/AntzBR/ObsidrelAPI.svg)](https://jitpack.io/#AntzBR/ObsidrelAPI)
