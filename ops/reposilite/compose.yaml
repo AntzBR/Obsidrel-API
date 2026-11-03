@@ -1,0 +1,17 @@
+# Deploy under /opt/obsidrel-maven (or another dedicated directory).
+# The app is only accessible locally; TLS is terminated by the VPS reverse proxy.
+services:
+  reposilite:
+    image: dzikoysk/reposilite:3.6.6
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8097:8080"
+    environment:
+      JAVA_OPTS: "-Xmx256M"
+      # Used only during one-time initialization; leave empty thereafter.
+      REPOSILITE_OPTS: "${REPOSILITE_OPTS:-}"
+    volumes:
+      - reposilite-data:/app/data
+
+volumes:
+  reposilite-data:

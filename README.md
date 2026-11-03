@@ -346,3 +346,7 @@ The Obsidrel Core owns the runtime API classes.
 ## License
 
 ObsidrelAPI is distributed under the MIT License.
+
+## Self-hosted Maven repository
+
+For the optional second publishing destination at `https://repo.obsidrel.com/releases`, see [the Reposilite deployment and release guide](docs/SELF_HOSTED_MAVEN.md). Maven Central remains the existing primary distribution channel.
