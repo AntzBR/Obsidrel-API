@@ -95,6 +95,36 @@ jobs:
             --no-transfer-progress \
             -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
+      # Keep Maven Central deployment untouched. This artifact is consumed by a
+      # separate job, so a self-hosted repo outage does not rerun the Central upload.
+      - name: Stage artifacts for the Obsidrel Maven repository
+        if: ${{ vars.OBSIDREL_MAVEN_ENABLED == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
+          test -f .flattened-pom.xml
+          for FILE in \
+            "target/ObsidrelAPI-${VERSION}.jar" \
+            "target/ObsidrelAPI-${VERSION}-sources.jar" \
+            "target/ObsidrelAPI-${VERSION}-javadoc.jar"; do
+            test -s "$FILE"
+          done
+          mkdir -p maven-release-artifacts
+          cp .flattened-pom.xml maven-release-artifacts/pom.xml
+          cp "target/ObsidrelAPI-${VERSION}.jar" maven-release-artifacts/
+          cp "target/ObsidrelAPI-${VERSION}-sources.jar" maven-release-artifacts/
+          cp "target/ObsidrelAPI-${VERSION}-javadoc.jar" maven-release-artifacts/
+
+      - name: Upload artifacts for the Obsidrel Maven repository
+        if: ${{ vars.OBSIDREL_MAVEN_ENABLED == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: obsidrel-maven-artifacts
+          path: maven-release-artifacts/
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Localizar JAR e Processar Metadados
         run: |
           FILE=$(find target -name "*.jar" ! -name "original-*" | head -n 1)
@@ -252,3 +282,35 @@ jobs:
                  }]
                }' \
                ${{ secrets.DISCORD_WEBHOOK }}
+
+  publish-obsidrel-maven:
+    name: Publish Obsidrel Maven Repository
+    needs: build
+    if: ${{ vars.OBSIDREL_MAVEN_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout publisher script
+        uses: actions/checkout@v4
+
+      - name: Download built Maven artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: obsidrel-maven-artifacts
+          path: maven-release-artifacts
+
+      - name: Configure Java and dedicated Maven credentials
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+          server-id: obsidrel
+          server-username: OBSIDREL_MAVEN_USERNAME
+          server-password: OBSIDREL_MAVEN_TOKEN
+
+      - name: Publish signed-release build to repo.obsidrel.com
+        env:
+          OBSIDREL_MAVEN_USERNAME: ${{ secrets.OBSIDREL_MAVEN_USERNAME }}
+          OBSIDREL_MAVEN_TOKEN: ${{ secrets.OBSIDREL_MAVEN_TOKEN }}
+        run: bash scripts/publish-obsidrel-maven.sh
